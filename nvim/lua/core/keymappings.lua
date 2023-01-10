@@ -19,12 +19,49 @@ vim.g.mapleader = ' '
 map('n', '<leader>pp', ':lua require"telescope.builtin".planets{}<cr>')
 map('n', '<leader>ff', ':FZF<cr>')
 
+map('n', '<leader>cx', ':!chmod +x %<cr><cr>')
+
+map('n', '<leader>y', "\"+y")
+map('v', '<leader>y', "\"+y")
+map('n', '<leader>Y', "\"+Y")
+
+-- From the PRIMEAGEN
+map('v', '<A-d>', ':m \'>+1<cr>gv=gv')
+map('v', '<A-u>', ':m \'<-2<cr>gv=gv')
+
+-- Could not use A-k and A-j to move visually selected text up and down
+-- due to the fact that the same hotkeys are used by .tmux.conf
+-- used A-u and A-d for alt-up and alt-down... -> You are welcome
+
+
+map('n', 'n', 'nzzzv')
+map('n', 'N', 'Nzzzv')
+
+map('n', '<leader>h', ':nohlsearch<cr>')
+
+-- map('x', '<leader>p', '"_dP')
+map('x', '<leader>p', '\"_dP')
+
+-- End of PRIMEAGEN config
+
+-- Added on -> Wednesday, 30 November 2022
+-- duck.nvim
+map('n', '<leader>dc', ':lua require("duck").hatch("🦆")<cr>')
+map('n', '<leader>dk', ':lua require("duck").cook("🦆")<cr>')
+-- map('n', '<leader>dd', 'function() require("duck").hatch("🦆", 10) end, {}') -- A pretty fast duck
+-- map('n', '<leader>dc', 'function() require("duck").hatch("🐈", 0.75) end, {}') -- Quite a mellow cat
+
+-- You can also specify how fast a duck moves(measured in steps per second)
+
 -- Save breakpoints to file automatically.
 -- map("n", "<leader><leader>b", "<cmd>lua require('persistent-breakpoints.api').toggle_breakpoint()<cr>", opts)
 
 -- map("n", "<YourKey2>", "<cmd>lua require('persistent-breakpoints.api').set_conditional_breakpoint()<cr>", opts)
 
 -- map("n", "<leader><leader>c", "<cmd>lua require('persistent-breakpoints.api').clear_all_breakpoints()<cr>", opts)
+
+-- 2022-12-18
+map('n', '<leader>ca', '<cmd>Lspsaga code_action<CR>', { silent = true })
 
 ------------------- config added on 12:29 PM -----------------
 
@@ -54,6 +91,11 @@ map('n', '<leader>co', ':copen <cr>')
 map('n', '<leader>cf', ':cfdo %s/')
 map('n', '<leader>cp', ':cprev<cr>zz')
 map('n', '<leader>cn', ':cnext<cr>zz')
+
+-- cellular-automaton.nvim ... Added on 29-11-2022
+map('n', '<leader>cm', '<cmd>CellularAutomaton make_it_rain<cr>')
+map('n', '<leader>cg', '<cmd>CellularAutomaton game_of_life<cr>')
+
 
 -- Yanking and copying whole files in neovim
 map('n', '<f5>', ':%y<cr>')
@@ -152,7 +194,7 @@ map("n", "<leader>tt", ":NvimTreeToggle<CR>")
 map("n", "<leader>tr", ":NvimTreeRefresh<CR>")
 
 -- vsplit commands
-map("n", "<C-b>", ":vsplit<CR>")
+map("n", "<leader><C-b>", ":vsplit<CR>")
 map("n", "<C-w>", ":split<CR>")
 
 -- commentary
@@ -189,8 +231,11 @@ map("n", "<leader>q", ":q!<CR>")
 
 
 -- bufferline tab stuff
-map("n", "<C-x>", ":BufferLinePickClose<CR>") -- close tab
+map("n", "<leader><C-x>", ":BufferLinePickClose<CR>") -- close tab
 
+
+map("n", "<C-d>", "<C-d>zz")
+map("n", "<C-u>", "<C-u>zz")
 
 -- move tabs
 map("n", "<C-c>", [[<CMD>:BufferLinePick<CR>]])
@@ -257,3 +302,16 @@ map('x', '<leader>ar', ':SearchBoxReplace exact=true visual_mode=true<cr>')
 
 map('n', '<leader><F1>', ":Telescope<cr>")
 map('n', '<leader><F2>', ":Telescope colorscheme<cr>")
+
+-- Remapping github copilot
+map('i', '<C-i>', "copilot#Accept(<Tab>)",{ expr = true, silent = true, script = true })
+
+-- 2022-12-28 11:13:00
+
+vim.keymap.set('n', '<leader>r', ':RunCode<cr>', { noremap = true, silent = false })
+vim.keymap.set('n', '<leader>rf', ':RunFile<cr>', { noremap = true, silent = false })
+vim.keymap.set('n', '<leader>rft', ':RunFile tab<cr>', { noremap = true, silent = false })
+vim.keymap.set('n', '<leader>rp', ':RunProject<cr>', { noremap = true, silent = false })
+vim.keymap.set('n', '<leader>rc', ':RunClose<cr>', { noremap = true, silent = false })
+vim.keymap.set('n', '<leader>crf', ':CRFiletype<cr>', { noremap = true, silent = false })
+vim.keymap.set('n', '<leader>crp', ':CRProjects<cr>', { noremap = true, silent = false })

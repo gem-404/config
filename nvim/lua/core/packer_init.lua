@@ -19,7 +19,91 @@ local packer = require 'packer'
 return packer.startup(function()
   use 'wbthomason/packer.nvim' -- packer can manage itself
   -- use 'gaoDean/autolist.nvim'
-  
+
+  use { "zbirenbaum/copilot.lua" }
+
+  -- use {
+  --     "zbirenbaum/copilot.lua",
+  --     event = "VimEnter",
+  --     config = function()
+  --       vim.defer_fn(function()
+  --         require("copilot").setup()
+  --       end, 100)
+  --     end,
+  -- }
+
+  -- 2022-12-28 15:00:00.000000000 +0100
+  use { 'CRAG666/code_runner.nvim', requires = 'nvim-lua/plenary.nvim' }
+
+  -- install theprimeagen harpoon
+  use { 
+      'ThePrimeagen/harpoon'
+      -- require("telescope").load_extension('harpoon'),
+  }
+
+  use({
+    "glepnir/lspsaga.nvim",
+    branch = "main",
+    config = function()
+        local saga = require("lspsaga")
+
+        saga.init_lsp_saga({
+            -- your configuration
+            -- local keymap = vim.keymap.set
+
+        -- Lsp finder find the symbol definition implement reference
+        -- if there is no implement it will hide
+        -- when you use action in finder like open vsplit then you can
+        -- use <C-t> to jump back
+            -- keymap("n", "gh", "<cmd>Lspsaga lsp_finder<CR>", { silent = true })
+
+            -- Code action
+            -- keymap({"n","v"}, "<leader>ca", "<cmd>Lspsaga code_action<CR>", { silent = true })
+
+            -- Rename
+            -- keymap("n", "gr", "<cmd>Lspsaga rename<CR>", { silent = true })
+
+            -- Peek Definition
+            -- you can edit the definition file in this flaotwindow
+            -- also support open/vsplit/etc operation check definition_action_keys
+            -- support tagstack C-t jump back
+            -- keymap("n", "gd", "<cmd>Lspsaga peek_definition<CR>", { silent = true })
+
+            -- Show line diagnostics
+            -- keymap("n", "<leader>cd", "<cmd>Lspsaga show_line_diagnostics<CR>", { silent = true })
+
+            -- Show cursor diagnostics
+            -- keymap("n", "<leader>cd", "<cmd>Lspsaga show_cursor_diagnostics<CR>", { silent = true })
+
+            -- Diagnostic jump can use `<c-o>` to jump back
+            -- keymap("n", "[e", "<cmd>Lspsaga diagnostic_jump_prev<CR>", { silent = true })
+            -- keymap("n", "]e", "<cmd>Lspsaga diagnostic_jump_next<CR>", { silent = true })
+
+            -- Only jump to error
+            -- keymap("n", "[E", function()
+              -- require("lspsaga.diagnostic").goto_prev({ severity = vim.diagnostic.severity.ERROR })
+            -- end, { silent = true })
+            -- keymap("n", "]E", function()
+              -- require("lspsaga.diagnostic").goto_next({ severity = vim.diagnostic.severity.ERROR })
+            -- end, { silent = true })
+
+            -- Outline
+            -- keymap("n","<leader>o", "<cmd>LSoutlineToggle<CR>",{ silent = true })
+
+            -- Hover Doc
+            -- keymap("n", "K", "<cmd>Lspsaga hover_doc<CR>", { silent = true })
+
+            -- Float terminal
+            -- keymap("n", "<A-d>", "<cmd>Lspsaga open_floaterm<CR>", { silent = true })
+            -- if you want to pass some cli command into a terminal you can do it like this
+            -- open lazygit in lspsaga float terminal
+            -- keymap("n", "<A-d>", "<cmd>Lspsaga open_floaterm lazygit<CR>", { silent = true })
+            -- close floaterm
+            -- keymap("t", "<A-d>", [[<C-\><C-n><cmd>Lspsaga close_floaterm<CR>]], { silent = true })
+        })
+    end,
+  })
+
   use {
       'VonHeikemen/searchbox.nvim',
       requires = {
@@ -27,6 +111,19 @@ return packer.startup(function()
       }
     }
 
+  -- Added on -> Wednesday, 30 November 2022
+  -- duck.nvim
+
+    use {
+        'tamton-aquib/duck.nvim',
+        config = function()
+            vim.keymap.set('n', '<leader>dd', function() require("duck").hatch() end, {})
+            vim.keymap.set('n', '<leader>dk', function() require("duck").cook() end, {})
+        end
+    }
+
+  -- End of duck.nvim
+  
   -- some added plugins -> 08/11/2022 -> 11:31 pm
   --
   -- 
@@ -38,6 +135,10 @@ return packer.startup(function()
   -- plugins added on 11/11/2022 -> 10:44pm
   use 'Sirver/ultisnips'
   use 'honza/vim-snippets'
+
+  -- some added plugins -> 08/11/2022 -> 11:31 pm
+  use 'eandrju/cellular-automaton.nvim'
+  
 
   use 'sbdchd/neoformat'
   -- use 'Weissle/persistent-breakpoints.nvim'

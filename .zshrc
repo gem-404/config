@@ -3,6 +3,8 @@
 #
 plugins+=(zsh-vi-mode)
 
+# run-help may be used in place of man
+
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
 
@@ -25,6 +27,15 @@ export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 
 export PATH="/Applications/Postgres.app/Contents/Versions/latest/bin:$PATH"
+
+# 2023-01-01 13:23
+# My own added settings from Shell Scripting Book
+
+# ignore common commands
+export HISTIGNORE=":pwd:id:uptime:resize:ls:clear:history:"
+
+# ignore duplicate entries
+export HISTCONTROL=ignoredups
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME="archcraft"
@@ -159,6 +170,15 @@ alias gc='git commit -m'
 alias gp='git push -u'
 alias gpat='cat /opt/deets.txt | xclip -sel clip'
 
+configs_copy() {
+    rm -rf ~/config/*
+    cp -r ~/.config/nvim ~/config
+    cp -r ~/.vim_runtime ~/config
+    cp ~/.zshrc ~/config
+}
+
+alias stop-mp='pkill -f mplayer'
+
 # alias tmux='tmux -u'
 
 alias py='python'
@@ -170,17 +190,21 @@ alias rst='reset'
 alias vi='vim'
 alias szsh='clear; source ~/.zshrc'
 
-alias todo='bat ~/Desktop/todo.txt'
-alias toed='nvim ~/Desktop/todo.txt'
-alias tolast='tail -n 1 ~/Desktop/todo.txt'
-alias toadd='cat >> ~/Desktop/todo.txt'
+alias checktodo='bat ~/Desktop/todo.txt'
+alias edittodo='nvim ~/Desktop/todo.txt'
 
-toad() {
-echo $1 >> ~/Desktop/todo.txt
+alias lasttodo='tail -n 1 ~/Desktop/todo.txt'
+alias addtodo='echo >> ~/Desktop/todo.txt'
+
+todoline() {
+    # add a single line of todo action to the todo file.
+    echo $1 >> ~/Desktop/todo.txt
 }
 
 torem() {
-    sed $1d ~/Desktop/todo.txt > ~/Desktop/todo.txt
+    # sed $1d ~/Desktop/todo.txt > ~/Desktop/todo.txt
+
+    echo "Very dangerous function"
 }
 
 toremnum() {
@@ -209,10 +233,15 @@ tomod() {
 }
 
 bcom() {
+    # function to check for the usage of a certain command or word in a command
+    # from the ~/.zsh_history.
     cat ~/.zsh_history | grep $1
 }
 
 bcnum() {
+    # function to check for the usage of a certain command or word in a command
+    # from the ~/.zsh_history, but in a given number of lines only...
+    # second argument provided is the number of lines to be displayed.
     cat ~/.zsh_history | grep $1 | tail -n $2
 }
 
@@ -220,7 +249,7 @@ gadd() {
     git add "$1" && git commit -m "$2" -m "$3"
 }
 
-set completion-ignore-case oN
+set completion-ignore-case on
 
 contains(){
     for file in $1;
@@ -317,7 +346,7 @@ fumbo(){
 
 alias gdog='git log --all --decorate --oneline --graph'
 
-alias pacman='sudo pacman -S'
+# alias pacman='sudo pacman -S'
 alias pacsearch='sudo pacman -Ss'
 alias pacmany='sudo pacman -Sy'
 alias update='sudo pacman -Syu'
@@ -344,8 +373,8 @@ mknew() {
 alias stima='echo "$(date) $1 units\n" >> ~/Desktop/stima.txt'
 
 
-alias vz='vim ~/.zshrc; source ~/.zshrc'
-alias nz='nvim ~/.zshrc; clear; source ~/.zshrc'
+alias vz='vim ~/.zshrc; clear'
+alias nz='nvim ~/.zshrc; clear'
 
 alias strun='streamlit run'
 
@@ -359,12 +388,37 @@ mkpasswd() {
 }
 
 nofap() {
-    number=`tail -n 1 ~/nofap/edits.txt | cut -d " " -f2`
+
+    file=~/nofap/edits4.txt
+    number=`tail -n 1 $file | cut -d " " -f2`
     nofap_count=`expr $number + 1`
     date=`date`
  
-    file=~/nofap/edits.txt
     echo -e "day $nofap_count of nofap -> `date`" >> $file
+
+    cat $file
+}
+
+# delete wallpapers from the wallpapers storage file
+func del_wals() {
+    # check whether there are more than 100 wallpaper files available
+    file=~/.wallpapers.txt
+
+    wal_nums=`cat $file | wc -l`
+    max_num=`expr $wal_nums - 100`
+
+    # since there is no easy way of providing variables to sed commands,
+    # here is what we will do,
+    # invert the $file lines such that the last line will be the first,
+    # delete the file from lines 101 to the last line, and invert back the file
+    if [ $wal_nums -ge 100 ]; then
+        echo "Lines greater than 100, reaching $wal_nums, deleting from line 0 to ($wal_nums - 100)"
+        tac $file | tee $file > /dev/null
+        sed -i '101,$d' $file
+        tac $file | tee $file > /dev/null
+        echo "Lines left are `cat $file | wc -l`"
+    fi
+
 }
 
 
@@ -382,7 +436,7 @@ alias cdoc='cd ~/Documents/'
 alias conf='cd ~/.config/'
 alias walp='cd ~/Pictures/wallpapers/'
 
-alias neovim='cd ~/.config/nvim/'
+# alias neovim='cd ~/.config/nvim/'
 
 (cat ~/.cache/wal/sequences &)
 

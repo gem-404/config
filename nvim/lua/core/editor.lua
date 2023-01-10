@@ -15,6 +15,14 @@ vim.opt.syntax = 'enable'
 --------------------- Added from reddit------------------------
 --------------------------------------------------------------
 
+vim.cmd("let g:UltiSnipsExpandTrigger='<C-l>'")
+-- vim.cmd("let g:UltiSnipsListSnippets='<C-k>'")
+
+-- shortcut to go to next position
+vim.cmd("let g:UltiSnipsJumpForwardTrigger='<C-b>'")
+vim.cmd("let g:UltiSnipsJumpBackwardTrigger='<C-z>'")
+
+vim.cmd("let g:UltiSnipsSnippetDirectories=['UltiSnips','~/.config/nvim/lua/snippets/py_snippets','~/.config/nvim/lua/snippets/js_snippets']")
 
 
 vim.opt.wildignore = {
@@ -25,6 +33,24 @@ vim.opt.wildignore = {
     "*.png", "__pycache__", "*.pyc", "*pycache*",
     "*.tar", "*.gz", "*.bz2", "*.zstd", "*.xz", "*.zip",
     "*.ttf", "*.otf", "*.woff", "*.woff2", "*.eot",
+}
+
+vim.g.copilot_no_tab_map = true
+vim.g.copilot_assume_mapped = true
+vim.g.copilot_tab_fallback = ""
+
+vim.g.copilot_filetypes = {
+    ["*"] = false,
+    ["javascript"] = true,
+    ["typescript"] = true,
+    ["html"] = true,
+    ["lua"] = true,
+    ["rust"] = true,
+    ["c"] = true,
+    ["c#"] = true,
+    ["c++"] = true,
+    ["go"] = true,
+    ["python"] = true,
 }
 
 -- indentation
@@ -48,7 +74,6 @@ vim.opt.complete = vim.opt.complete + 'kspell'
 vim.opt.completeopt = {'menuone', 'noinsert', 'noselect', 'preview'}
 vim.opt.shortmess = vim.opt.shortmess + { c = true }
 -- vim.opt.completion_enable_auto_popup = 0
--- vim.opt.completion_enable_snippet = 'Ultisnips'
 -- vim.opt.completion_sorting = "length"
 
 -- neoformatter for python
@@ -66,6 +91,29 @@ require("mason").setup({
     }
 })
 
+-- 2022-12-28 11:12:00
+
+require('code_runner').setup({
+  -- put here the commands by filetype
+  mode = "term",
+  focus = true,
+  startinsert = false,
+  term = {
+      position = "vert",
+      size = 70,
+  },
+  
+  filetype = {
+		java = "cd $dir && javac $fileName && java $fileNameWithoutExt",
+		python = "python3 -u",
+		typescript = "deno run",
+        javascript = "node $fileName",
+		rust = "cd $dir && rustc $fileName && $dir/$fileNameWithoutExt",
+        go = "go run",
+        sh = "./$fileName",
+	},
+})
+
 require 'nvim-tree'.setup{}
 
 require ('nvim_comment').setup()
@@ -74,39 +122,109 @@ require ('nvim_comment').setup()
 --
 -- Added on 04:10 PM 2022-11-23
 
-require('nvim-autopairs').setup{}
+-- require('nvim-autopairs').setup{}
 
 -- If you want insert `(` after select function or method item
 
-local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+-- local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+
 local cmp = require('cmp')
-cmp.event:on(
-  'confirm_done',
-  cmp_autopairs.on_confirm_done()
-)
 
-local npairs = require("nvim-autopairs")
-local Rule = require('nvim-autopairs.rule')
+-- cmp.event:on(
+--   'confirm_done',
+--   cmp_autopairs.on_confirm_done()
+-- )
 
-npairs.setup({
-    check_ts = true,
-    ts_config = {
-        lua = {'string'},-- it will not add a pair on that treesitter node
-        javascript = {'template_string'},
-        java = false,-- don't check treesitter on java
-    }
+-- Beginning of copilot setup
+
+require('copilot').setup({
+  panel = {
+    enabled = true,
+    auto_refresh = false,
+    keymap = {
+      jump_prev = "[[",
+      jump_next = "]]",
+      accept = "<CR>",
+      refresh = "gr",
+      open = "<M-CR>"
+    },
+  },
+  suggestion = {
+    enabled = true,
+    auto_trigger = false,
+    debounce = 75,
+    keymap = {
+     accept = "<M-l>",
+     next = "<M-]>",
+     prev = "<M-[>",
+     dismiss = "<C-]>",
+    },
+  },
+  filetypes = {
+    javascript = true,
+    typescript = true,
+    python = true,
+    rust = true,
+    go = true,
+    java = true,
+    html = true,
+    sh = true,
+    cpp = true,
+    c = true,
+    css = true,
+    bash = true,
+    ["sh"] = true,
+    ["c++"] = true,
+    ["c"] = true,
+    ["c#"] = true,
+    ["*"] = false,
+    yaml = false,
+    markdown = true,
+    help = false,
+    gitcommit = false,
+    gitrebase = false,
+    hgcommit = false,
+    svn = false,
+    cvs = false,
+    ["."] = false,
+  },
+  copilot_node_command = 'node', -- Node.js version must be > 16.x
+  server_opts_overrides = {},
 })
 
-local ts_conds = require('nvim-autopairs.ts-conds')
+cmp.event:on("menu_opened", function()
+  vim.b.copilot_suggestion_hidden = true
+end)
+
+cmp.event:on("menu_closed", function()
+  vim.b.copilot_suggestion_hidden = false
+end)
+
+-- local npairs = require("nvim-autopairs")
+-- local Rule = require('nvim-autopairs.rule')
+
+-- npairs.setup({
+--     check_ts = true,
+--     ts_config = {
+--         lua = {'string'},-- it will not add a pair on that treesitter node
+--         javascript = {'template_string'},
+--         java = false,-- don't check treesitter on java
+--     }
+-- })
+
+-- 2022-12-24
+require("autoclose").setup({})
+
+-- local ts_conds = require('nvim-autopairs.ts-conds')
 
 
 -- press % => %% only while inside a comment or string
-npairs.add_rules({
-  Rule("%", "%", "lua")
-    :with_pair(ts_conds.is_ts_node({'string','comment'})),
-  Rule("$", "$", "lua")
-    :with_pair(ts_conds.is_not_ts_node({'function'}))
-})
+-- npairs.add_rules({
+--   Rule("%", "%", "lua")
+--     :with_pair(ts_conds.is_ts_node({'string','comment'})),
+--   Rule("$", "$", "lua")
+--     :with_pair(ts_conds.is_not_ts_node({'function'}))
+-- })
 
 --------- End of configurations for this day ---------------------------
 
@@ -354,7 +472,13 @@ cmp.setup {
   },
 }
 
+-- new lines here -> 18.12.2022
 
+vim.api.nvim_set_keymap("i", "<C-Space>", "compe#complete()", { expr = true })
+
+vim.api.nvim_set_keymap("i", "<C-e>", "compe#close('<C-e>')", { expr = true })
+
+vim.api.nvim_set_keymap("i", "<C-f>", "compe#scroll({ 'delta': +4 })", { expr = true })
 
   -- Setup lspconfig.
 local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
@@ -470,6 +594,7 @@ local nvim_lsp = require 'lspconfig'
 
 -- Add additional capabilities supported by nvim-cmp
 local capabilities = vim.lsp.protocol.make_client_capabilities()
+
 capabilities.textDocument.completion.completionItem.documentationFormat = { 'markdown', 'plaintext' }
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 capabilities.textDocument.completion.completionItem.preselectSupport = true
@@ -593,6 +718,10 @@ augroup indent_blankline
   autocmd InsertLeave * call Should_activate_indentblankline()
 augroup END
 ]])
+
+require'lspconfig'.jdtls.setup {
+    capabilities = capabilities,
+}
 
 require'compe'.setup {
   enabled = true;
@@ -825,34 +954,35 @@ local true_zen = require("true-zen")
 --   end,
 -- })
 --
--- local prettier = require("prettier")
---
--- prettier.setup({
---   bin = 'prettier', -- or `prettierd`
---   filetypes = {
---     "css",
---     "graphql",
---     "html",
---     "javascript",
---     "javascriptreact",
---     "json",
---     "less",
---     "markdown",
---     "scss",
---     "typescript",
---     "typescriptreact",
---     "yaml",
---   },
--- })
---
--- prettier.setup({
---   ["null-ls"] = {
---     runtime_condition = function(params)
---       -- return false to skip running prettier
---       return true
---     end,
---     timeout = 5000,
---   }
--- })
+
+local prettier = require("prettier")
+
+prettier.setup({
+  bin = 'prettier', -- or `prettierd`
+  filetypes = {
+    "css",
+    "graphql",
+    "html",
+    "javascript",
+    "javascriptreact",
+    "json",
+    "less",
+    "markdown",
+    "scss",
+    "typescript",
+    "typescriptreact",
+    "yaml",
+  },
+})
+
+prettier.setup({
+  ["null-ls"] = {
+    runtime_condition = function(params)
+      -- return false to skip running prettier
+      return true
+    end,
+    timeout = 5000,
+  }
+})
 
 return M
